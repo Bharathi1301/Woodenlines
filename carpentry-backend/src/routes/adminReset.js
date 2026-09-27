@@ -24,14 +24,20 @@ router.post('/reset-admin', async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+   let user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'Admin user not found.',
-      });
-    }
+if (!user) {
+  user = await User.create({
+    name: 'Admin',
+    email,
+    password: newPassword,
+    role: 'admin',
+  });
+} else {
+  user.password = newPassword;
+  user.role = 'admin';
+  await user.save();
+}
 
     user.password = newPassword;
     user.role = 'admin';
